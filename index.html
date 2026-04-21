@@ -235,6 +235,7 @@
       }
 
       .personal {
+        position: relative;
         display: inline-flex;
         align-items: center;
         gap: 6px;
@@ -244,10 +245,16 @@
         text-transform: uppercase;
         color: var(--color-text-secondary);
         text-decoration: none;
-        padding: 4px 6px;
-        margin: -4px -6px;
-        border-radius: 6px;
+        padding: 8px 10px;
+        margin: -8px -10px;
+        border-radius: 8px;
         transition: color 150ms ease, background 150ms ease;
+      }
+      .personal::before {
+        content: "";
+        position: absolute;
+        inset: -6px;
+        z-index: -1;
       }
       .personal:hover {
         color: var(--color-text-primary);
@@ -448,7 +455,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 12px 14px;
+        padding: 16px 18px;
         background: var(--bg);
         color: var(--fg);
         border: 1px solid var(--bd);
@@ -463,6 +470,14 @@
           box-shadow 180ms ease,
           border-color 150ms ease,
           background 150ms ease;
+      }
+
+      /* Expand touch target beyond visual bounds for easier tapping on mobile */
+      .btn::before {
+        content: "";
+        position: absolute;
+        inset: -6px -4px;
+        z-index: -1;
       }
 
       .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
