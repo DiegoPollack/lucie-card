@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#FAF8F5" />
+    <title>Diego Pollack — CTO, Lucie</title>
+    <meta name="description" content="Diego Pollack, CTO of Lucie — a precision instrument for manufacturing experts." />
+
+    <link rel="icon" type="image/png" href="./lucie-logo-red.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+
+    <style>
+      :root {
+        --color-background: #faf8f5;
+        --color-surface: #ffffff;
+        --color-surface-warm: #f5f0eb;
+        --color-teal: #0d9488;
+        --color-teal-dark: #0b7a70;
+        --color-teal-ring: rgba(13, 148, 136, 0.28);
+        --color-red: #772310;
+        --color-red-dark: #5d1a0c;
+        --color-amber: #d4940a;
+        --color-ai-start: #6366f1;
+        --color-ai-end: #818cf8;
+        --color-text-primary: #1f1a17;
+        --color-text-secondary: #5a4f47;
+        --color-text-muted: #8a7d74;
+        --color-border: rgba(31, 26, 23, 0.12);
+        --color-border-subtle: rgba(31, 26, 23, 0.08);
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 16px;
+        --shadow-sm: 0 1px 2px rgba(31, 26, 23, 0.06), 0 1px 1px rgba(31, 26, 23, 0.04);
+        --shadow-md: 0 4px 14px rgba(31, 26, 23, 0.08), 0 2px 4px rgba(31, 26, 23, 0.04);
+        --shadow-lg: 0 20px 48px rgba(31, 26, 23, 0.14), 0 8px 16px rgba(31, 26, 23, 0.06);
+        --font-display: "Lora", "Georgia", serif;
+        --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+        --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+        background: var(--color-background);
+        color: var(--color-text-primary);
+        font-family: var(--font-body);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body {
+        position: relative;
+        overflow: hidden;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      /* 3D canvas fills viewport */
+      #scene {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      /* Subtle paper grain over the cream background to reject SaaS flatness */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        background-image: radial-gradient(
+            circle at 20% 20%,
+            rgba(119, 35, 16, 0.04) 0%,
+            transparent 40%
+          ),
+          radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.05) 0%, transparent 45%);
+      }
+
+      main {
+        position: relative;
+        z-index: 2;
+        min-height: 100vh;
+        min-height: 100dvh;
+        display: grid;
+        place-items: center;
+        padding: 32px 20px;
+      }
+
+      .card {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        padding: 40px 40px 32px;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: saturate(140%) blur(18px);
+        -webkit-backdrop-filter: saturate(140%) blur(18px);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+      }
+
+      /* Editorial top rule — evokes Monocle masthead */
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          var(--color-red) 0%,
+          var(--color-red) 38%,
+          var(--color-amber) 38%,
+          var(--color-amber) 62%,
+          var(--color-teal) 62%,
+          var(--color-teal) 100%
+        );
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+      }
+
+      .brand-logo {
+        height: 28px;
+        width: auto;
+        display: block;
+      }
+
+      .brand-meta {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+      }
+
+      .brand-meta .wordmark {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: 1.25rem;
+        letter-spacing: -0.01em;
+        color: var(--color-text-primary);
+      }
+
+      .brand-meta .tagline {
+        margin-top: 6px;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--color-text-muted);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-teal);
+        margin-bottom: 14px;
+      }
+
+      .eyebrow .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--color-teal);
+        box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+        animation: pulse 2.4s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15);
+        }
+        50% {
+          box-shadow: 0 0 0 8px rgba(13, 148, 136, 0);
+        }
+      }
+
+      h1 {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin: 0 0 10px;
+        color: var(--color-text-primary);
+      }
+
+      h1 .surname {
+        color: var(--color-red);
+      }
+
+      .role {
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        color: var(--color-text-secondary);
+        margin: 0 0 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .role .sep {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: var(--color-text-muted);
+        opacity: 0.5;
+      }
+
+      .role .company {
+        font-weight: 600;
+        color: var(--color-text-primary);
+      }
+
+      .bio {
+        font-size: 0.95rem;
+        line-height: 1.55;
+        color: var(--color-text-secondary);
+        margin: 0 0 28px;
+        padding: 16px 18px;
+        background: var(--color-surface-warm);
+        border-left: 3px solid var(--color-red);
+        border-radius: var(--radius-sm);
+      }
+
+      .bio em {
+        font-style: normal;
+        color: var(--color-text-primary);
+        font-weight: 600;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .btn {
+        --bg: var(--color-surface);
+        --fg: var(--color-text-primary);
+        --bd: var(--color-border);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        background: var(--bg);
+        color: var(--fg);
+        border: 1px solid var(--bd);
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.95rem;
+        font-weight: 500;
+        text-decoration: none;
+        transition:
+          transform 200ms ease,
+          box-shadow 200ms ease,
+          border-color 150ms ease,
+          background 150ms ease;
+        cursor: pointer;
+        overflow: hidden;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--color-teal-ring);
+      }
+
+      .btn .icon {
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+        color: var(--fg);
+      }
+
+      .btn .label {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .btn .arrow {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        opacity: 0.5;
+        transition: transform 200ms ease, opacity 150ms ease;
+      }
+
+      .btn:hover .arrow {
+        transform: translateX(3px);
+        opacity: 1;
+      }
+
+      .btn-primary {
+        --bg: var(--color-teal);
+        --fg: #ffffff;
+        --bd: var(--color-teal);
+      }
+      .btn-primary:hover {
+        --bg: var(--color-teal-dark);
+        --bd: var(--color-teal-dark);
+      }
+
+      .btn-secondary {
+        --bg: var(--color-surface);
+        --fg: var(--color-text-primary);
+        --bd: var(--color-border);
+      }
+      .btn-secondary:hover {
+        --bd: var(--color-teal);
+      }
+
+      .btn-brand {
+        --bg: var(--color-surface);
+        --fg: var(--color-red);
+        --bd: rgba(119, 35, 16, 0.22);
+      }
+      .btn-brand:hover {
+        --bd: var(--color-red);
+      }
+
+      footer {
+        margin-top: 28px;
+        padding-top: 16px;
+        border-top: 1px solid var(--color-border-subtle);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.08em;
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+      }
+
+      footer a {
+        color: var(--color-text-muted);
+        text-decoration: none;
+        transition: color 150ms ease;
+      }
+      footer a:hover {
+        color: var(--color-teal);
+      }
+
+      .card {
+        will-change: transform;
+        transform-style: preserve-3d;
+      }
+
+      .motion-enable {
+        position: fixed;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        right: calc(16px + env(safe-area-inset-right, 0px));
+        z-index: 3;
+        padding: 9px 14px;
+        background: rgba(255, 255, 255, 0.85);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        backdrop-filter: saturate(140%) blur(10px);
+        -webkit-backdrop-filter: saturate(140%) blur(10px);
+        box-shadow: var(--shadow-sm);
+        transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+      }
+      .motion-enable:hover {
+        background: var(--color-teal);
+        color: #fff;
+        border-color: var(--color-teal);
+      }
+      .motion-enable[hidden] {
+        display: none;
+      }
+
+      @media (max-width: 520px) {
+        .card {
+          padding: 32px 24px 24px;
+        }
+        .bio {
+          padding: 14px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #scene {
+          display: none;
+        }
+        .eyebrow .dot {
+          animation: none;
+        }
+        body::before {
+          background: radial-gradient(
+              circle at 20% 20%,
+              rgba(119, 35, 16, 0.06) 0%,
+              transparent 40%
+            ),
+            radial-gradient(circle at 80% 80%, rgba(13, 148, 136, 0.07) 0%, transparent 45%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene" aria-hidden="true"></canvas>
+    <button id="enable-motion" class="motion-enable" type="button" hidden>
+      Enable motion
+    </button>
+
+    <main>
+      <article class="card" role="article" aria-label="Business card for Diego Pollack">
+        <header class="brand">
+          <img
+            class="brand-logo"
+            src="./lucie-logo-red.png"
+            alt="Lucie"
+            width="28"
+            height="28"
+          />
+          <div class="brand-meta">
+            <span class="wordmark">Lucie</span>
+            <span class="tagline">AI for manufacturing</span>
+          </div>
+        </header>
+
+        <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Available</span>
+
+        <h1>
+          Diego
+          <span class="surname">Pollack</span>
+        </h1>
+
+        <p class="role">
+          <span>Co-founder &amp; CTO</span>
+          <span class="sep" aria-hidden="true"></span>
+          <span class="company">Lucie</span>
+        </p>
+
+        <p class="bio">
+          Building a <em>precision instrument</em> for plant directors and production
+          planners — turning SAP chaos and line noise into confident daily decisions.
+        </p>
+
+        <nav class="actions" aria-label="Contact actions">
+          <a
+            class="btn btn-primary"
+            href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3ZqR4IFhSw2VKC3umRDXWRoqqWey2irw3--PsIVo9iLcCtPOmUkBulXnocXog5_PwU6p7IFyaj"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path>
+            </svg>
+            <span class="label">Book a demo</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          <a
+            class="btn btn-secondary"
+            href="https://www.linkedin.com/in/diego-pollack-21a933262/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.368-1.852 3.6 0 4.268 2.37 4.268 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
+            </svg>
+            <span class="label">Connect on LinkedIn</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+
+          <a
+            class="btn btn-brand"
+            href="https://lucieops.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"></path>
+            </svg>
+            <span class="label">Visit lucieops.com</span>
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </nav>
+
+        <footer>
+          <span>Lisbon · Remote</span>
+          <a href="mailto:diego@lucieops.com">diego@lucieops.com</a>
+        </footer>
+      </article>
+    </main>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.161.0/build/three.module.js"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+
+      const canvas = document.getElementById("scene");
+      const card = document.querySelector(".card");
+      const motionBtn = document.getElementById("enable-motion");
+
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      // Single source of tilt input — fed by either pointer or device orientation.
+      const tilt = { tx: 0, ty: 0, cx: 0, cy: 0, hasGyro: false };
+
+      const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+      window.addEventListener("pointermove", (e) => {
+        if (tilt.hasGyro) return;
+        tilt.tx = (e.clientX / window.innerWidth) * 2 - 1;
+        tilt.ty = -((e.clientY / window.innerHeight) * 2 - 1);
+      });
+
+      function handleOrientation(e) {
+        if (e.beta == null || e.gamma == null) return;
+        tilt.hasGyro = true;
+        // gamma: left/right tilt (-90..90). beta: front/back (-180..180); ~40 when reading.
+        tilt.tx = clamp(e.gamma / 35, -1, 1);
+        tilt.ty = clamp((e.beta - 40) / 35, -1, 1);
+      }
+      window.addEventListener("deviceorientation", handleOrientation);
+
+      // iOS 13+ needs explicit permission; show a pill only on that platform.
+      const needsMotionPermission =
+        typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function";
+
+      if (motionBtn && needsMotionPermission && !prefersReducedMotion) {
+        motionBtn.hidden = false;
+        motionBtn.addEventListener("click", async () => {
+          try {
+            const res = await DeviceOrientationEvent.requestPermission();
+            if (res === "granted") {
+              window.addEventListener("deviceorientation", handleOrientation);
+            }
+          } catch {
+            // permission dialog dismissed — silently fall back to pointer
+          } finally {
+            motionBtn.hidden = true;
+          }
+        });
+      }
+
+      if (!prefersReducedMotion) {
+        smoothTiltLoop();
+        initScene();
+        initCardTilt();
+      }
+
+      function smoothTiltLoop() {
+        tilt.cx += (tilt.tx - tilt.cx) * 0.06;
+        tilt.cy += (tilt.ty - tilt.cy) * 0.06;
+        requestAnimationFrame(smoothTiltLoop);
+      }
+
+      function initCardTilt() {
+        if (!card) return;
+        function loop() {
+          card.style.transform =
+            `perspective(1400px) rotateX(${tilt.cy * -1.6}deg) rotateY(${tilt.cx * 1.6}deg)`;
+          requestAnimationFrame(loop);
+        }
+        loop();
+      }
+
+      function initScene() {
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(window.innerWidth, window.innerHeight, false);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(
+          45,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          100
+        );
+        camera.position.set(0, 0, 6);
+
+        // Brand palette as THREE colors
+        const teal = new THREE.Color("#0D9488");
+        const red = new THREE.Color("#772310");
+        const amber = new THREE.Color("#D4940A");
+
+        // --- Outer wireframe icosahedron (red, thin) ---
+        const outerEdges = new THREE.EdgesGeometry(
+          new THREE.IcosahedronGeometry(1.9, 0)
+        );
+        const outer = new THREE.LineSegments(
+          outerEdges,
+          new THREE.LineBasicMaterial({
+            color: red,
+            transparent: true,
+            opacity: 0.62,
+          })
+        );
+        scene.add(outer);
+
+        // --- Inner wireframe octahedron (teal, counter-rotating) ---
+        const innerEdges = new THREE.EdgesGeometry(
+          new THREE.OctahedronGeometry(0.95, 0)
+        );
+        const inner = new THREE.LineSegments(
+          innerEdges,
+          new THREE.LineBasicMaterial({
+            color: teal,
+            transparent: true,
+            opacity: 0.55,
+          })
+        );
+        scene.add(inner);
+
+        // --- Sparse amber dust motes ---
+        const dustCount = 18;
+        const dustPos = new Float32Array(dustCount * 3);
+        for (let i = 0; i < dustCount; i++) {
+          const r = 2.6 + Math.random() * 2.6;
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          dustPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          dustPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          dustPos[i * 3 + 2] = r * Math.cos(phi) - 0.5;
+        }
+        const dustGeo = new THREE.BufferGeometry();
+        dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+        const dust = new THREE.Points(
+          dustGeo,
+          new THREE.PointsMaterial({
+            color: amber,
+            size: 0.045,
+            transparent: true,
+            opacity: 0.55,
+            depthWrite: false,
+            sizeAttenuation: true,
+          })
+        );
+        scene.add(dust);
+
+        window.addEventListener("resize", () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight, false);
+        });
+
+        let running = true;
+        document.addEventListener("visibilitychange", () => {
+          running = !document.hidden;
+          if (running) clock.start();
+        });
+
+        const clock = new THREE.Clock();
+        function animate() {
+          requestAnimationFrame(animate);
+          if (!running) return;
+          const t = clock.getElapsedTime();
+
+          outer.rotation.y = t * 0.08 + tilt.cx * 0.4;
+          outer.rotation.x = t * 0.05 + tilt.cy * 0.3;
+
+          inner.rotation.y = -t * 0.13 - tilt.cx * 0.28;
+          inner.rotation.x = -t * 0.07 - tilt.cy * 0.2;
+
+          const breath = 1 + Math.sin(t * 0.5) * 0.015;
+          outer.scale.setScalar(breath);
+          inner.scale.setScalar(1 / breath);
+
+          dust.rotation.y = t * 0.025;
+
+          camera.position.x += (tilt.cx * 0.4 - camera.position.x) * 0.03;
+          camera.position.y += (tilt.cy * 0.28 - camera.position.y) * 0.03;
+          camera.lookAt(0, 0, 0);
+
+          renderer.render(scene, camera);
+        }
+        animate();
+      }
+    </script>
+  </body>
+</html>
