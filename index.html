@@ -183,6 +183,12 @@
           radial-gradient(circle at 88% 92%, rgba(13, 148, 136, 0.05), transparent 55%),
           var(--color-paper);
         box-shadow: var(--shadow-card);
+        /* iOS Safari backface-visibility workarounds */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        /* Force hardware acceleration and explicit z-ordering */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
       }
 
       .face::after {
@@ -196,9 +202,15 @@
           inset 0 -1px 0 rgba(31, 26, 23, 0.05),
           inset 1px 0 0 rgba(255, 255, 255, 0.4),
           inset -1px 0 0 rgba(31, 26, 23, 0.04);
+        /* iOS Safari needs explicit z-layer for pseudo-elements too */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
       }
 
-      .face-back { transform: rotateY(180deg); }
+      .face-back {
+        transform: rotateY(180deg) translateZ(0);
+        -webkit-transform: rotateY(180deg) translateZ(0);
+      }
 
       .face .rule {
         position: relative;
@@ -224,6 +236,9 @@
         display: flex;
         flex-direction: column;
         padding: 22px 22px 20px;
+        /* iOS Safari: force .inner onto its own compositing layer */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
       }
 
       .front-header {
@@ -238,39 +253,41 @@
         position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
         font-family: var(--font-mono);
-        font-size: 0.6rem;
+        font-size: 0.62rem;
         letter-spacing: 0.12em;
         text-transform: uppercase;
         color: var(--color-text-secondary);
         text-decoration: none;
-        padding: 8px 10px;
-        margin: -8px -10px;
-        border-radius: 8px;
+        padding: 10px 12px;
+        margin: -10px -12px;
+        border-radius: 10px;
         transition: color 150ms ease, background 150ms ease;
       }
+      /* Expanded invisible touch target for easier tapping */
       .personal::before {
         content: "";
         position: absolute;
-        inset: -6px;
+        inset: -10px -8px;
         z-index: -1;
       }
       .personal:hover {
         color: var(--color-text-primary);
-        background: rgba(31, 26, 23, 0.04);
+        background: rgba(31, 26, 23, 0.06);
       }
       .personal .li-dot {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 16px;
-        height: 16px;
-        border-radius: 3px;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
         background: #0a66c2;
         color: #fff;
+        flex-shrink: 0;
       }
-      .personal .li-dot svg { width: 10px; height: 10px; }
+      .personal .li-dot svg { width: 12px; height: 12px; }
 
       .front-identity {
         flex: 1;
@@ -391,6 +408,9 @@
         display: flex;
         flex-direction: column;
         padding: 22px 22px 20px;
+        /* iOS Safari: force .inner onto its own compositing layer */
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
       }
 
       .back-header {
