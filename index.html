@@ -94,8 +94,7 @@
       }
       html.force-light .btn { background: var(--bg) !important; color: var(--fg) !important; }
       html.force-light .drag-hint,
-      html.force-light .motion-enable,
-      html.force-light .theme-toggle {
+      html.force-light .motion-enable {
         background-color: rgba(255, 255, 255, 0.92) !important;
       }
       html.force-light img { filter: none !important; }
@@ -575,37 +574,6 @@
         transform: translateX(-50%) translateY(-8px);
       }
 
-      .theme-toggle {
-        position: fixed;
-        top: calc(14px + env(safe-area-inset-top, 0px));
-        right: calc(14px + env(safe-area-inset-right, 0px));
-        z-index: 4;
-        width: 38px;
-        height: 38px;
-        padding: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.92);
-        border: 1px solid var(--color-border);
-        border-radius: 999px;
-        color: var(--color-text-secondary);
-        cursor: pointer;
-        backdrop-filter: saturate(140%) blur(10px);
-        -webkit-backdrop-filter: saturate(140%) blur(10px);
-        box-shadow: var(--shadow-sm);
-        transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
-      }
-      .theme-toggle:hover {
-        color: var(--color-text-primary);
-        border-color: rgba(31, 26, 23, 0.22);
-      }
-      .theme-toggle:active { transform: scale(0.96); }
-      .theme-toggle svg { width: 18px; height: 18px; }
-      .theme-toggle .icon-moon { display: none; }
-      html:not(.force-light) .theme-toggle .icon-sun { display: none; }
-      html:not(.force-light) .theme-toggle .icon-moon { display: block; }
-
       .motion-enable {
         position: fixed;
         bottom: calc(16px + env(safe-area-inset-bottom, 0px));
@@ -641,23 +609,6 @@
   </head>
   <body>
     <canvas id="scene" aria-hidden="true"></canvas>
-
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light mode" title="Toggle light mode">
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="4"></circle>
-        <line x1="12" y1="2" x2="12" y2="4"></line>
-        <line x1="12" y1="20" x2="12" y2="22"></line>
-        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-        <line x1="2" y1="12" x2="4" y2="12"></line>
-        <line x1="20" y1="12" x2="22" y2="12"></line>
-        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-      </svg>
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
 
     <button id="enable-motion" class="motion-enable" type="button" hidden>
       Enable motion
@@ -824,19 +775,10 @@
       const card = document.getElementById("card");
       const motionBtn = document.getElementById("enable-motion");
       const dragHint = document.getElementById("drag-hint");
-      const themeToggle = document.getElementById("theme-toggle");
 
       const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
-
-      // ---------- THEME TOGGLE ----------
-      themeToggle.addEventListener("click", () => {
-        const forced = document.documentElement.classList.toggle("force-light");
-        try {
-          localStorage.setItem("lucie-card-force-light", forced ? "1" : "0");
-        } catch {}
-      });
 
       // ---------- TILT / PARALLAX ----------
       const tilt = { tx: 0, ty: 0, cx: 0, cy: 0, hasGyro: false };
