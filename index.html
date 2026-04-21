@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
     <title>Diego Pollack — CTO, Lucie</title>
-    <meta name="description" content="Diego Pollack, CTO of Lucie — a precision instrument for manufacturing experts." />
+    <meta name="description" content="Diego Pollack, CTO of Lucie — planning made easy for manufacturing." />
 
     <link rel="icon" type="image/png" href="./lucie-logo-red.png" />
 
@@ -76,6 +76,29 @@
         min-height: 100vh;
         min-height: 100dvh;
       }
+
+      /*
+        Defensive light-mode lockdown — some mobile browsers (Chrome's "Force dark mode"
+        setting, Samsung Internet "Night mode") ignore color-scheme. When `.force-light`
+        is active on <html> we re-pin the palette with !important so those browsers
+        can't invert the page.
+      */
+      html.force-light,
+      html.force-light body {
+        background-color: #faf8f5 !important;
+        color: #1f1a17 !important;
+        color-scheme: light !important;
+      }
+      html.force-light .face {
+        background-color: #fbf8f3 !important;
+      }
+      html.force-light .btn { background: var(--bg) !important; color: var(--fg) !important; }
+      html.force-light .drag-hint,
+      html.force-light .motion-enable,
+      html.force-light .theme-toggle {
+        background-color: rgba(255, 255, 255, 0.92) !important;
+      }
+      html.force-light img { filter: none !important; }
 
       #scene {
         position: fixed;
@@ -162,7 +185,6 @@
         box-shadow: var(--shadow-card);
       }
 
-      /* Inner embossed highlight on the face — gives card-stock depth */
       .face::after {
         content: "";
         position: absolute;
@@ -178,7 +200,6 @@
 
       .face-back { transform: rotateY(180deg); }
 
-      /* Tri-color editorial rule on top of each face */
       .face .rule {
         position: relative;
         z-index: 3;
@@ -202,51 +223,96 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        padding: 26px 26px 22px;
+        padding: 22px 22px 20px;
       }
 
       .front-header {
         display: flex;
+        justify-content: space-between;
         align-items: center;
         gap: 10px;
         flex-shrink: 0;
       }
 
-      .front-header .brand-logo {
-        height: 28px;
-        width: auto;
-        display: block;
-      }
-
-      .front-header .brand-text {
-        display: flex;
-        flex-direction: column;
-        line-height: 1;
-      }
-
-      .front-header .wordmark {
-        font-family: var(--font-display);
-        font-weight: 500;
-        font-size: 1.2rem;
-        letter-spacing: -0.01em;
-        color: var(--color-text-primary);
-      }
-
-      .front-header .tagline {
-        margin-top: 6px;
+      .personal {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         font-family: var(--font-mono);
-        font-size: 0.62rem;
-        letter-spacing: 0.14em;
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: var(--color-text-muted);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        padding: 4px 6px;
+        margin: -4px -6px;
+        border-radius: 6px;
+        transition: color 150ms ease, background 150ms ease;
       }
+      .personal:hover {
+        color: var(--color-text-primary);
+        background: rgba(31, 26, 23, 0.04);
+      }
+      .personal .li-dot {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        background: #0a66c2;
+        color: #fff;
+      }
+      .personal .li-dot svg { width: 10px; height: 10px; }
 
       .front-identity {
         flex: 1;
         display: flex;
         flex-direction: column;
+        align-items: center;
         justify-content: center;
-        padding: 12px 0;
+        text-align: center;
+        padding: 10px 4px;
+      }
+
+      .hero-logo {
+        width: 64px;
+        height: auto;
+        display: block;
+        margin-bottom: 14px;
+        filter: drop-shadow(0 4px 10px rgba(119, 35, 16, 0.18));
+      }
+
+      .hero-word {
+        font-family: var(--font-display);
+        font-weight: 500;
+        font-size: clamp(3rem, 14vw, 4rem);
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin: 0;
+        color: var(--color-red);
+      }
+
+      .hero-tagline {
+        margin: 12px 0 0;
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+      }
+
+      .front-identity .pitch {
+        margin: 18px 0 0;
+        font-size: 0.78rem;
+        line-height: 1.55;
+        color: var(--color-text-secondary);
+      }
+
+      .front-identity .pitch em {
+        font-style: normal;
+        color: var(--color-text-primary);
+        font-weight: 600;
       }
 
       .eyebrow {
@@ -254,11 +320,10 @@
         align-items: center;
         gap: 8px;
         font-family: var(--font-mono);
-        font-size: 0.66rem;
-        letter-spacing: 0.16em;
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--color-teal);
-        margin-bottom: 14px;
       }
 
       .eyebrow .dot {
@@ -273,45 +338,6 @@
       @keyframes pulse {
         0%, 100% { box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15); }
         50% { box-shadow: 0 0 0 8px rgba(13, 148, 136, 0); }
-      }
-
-      .front-identity h1 {
-        font-family: var(--font-display);
-        font-weight: 500;
-        font-size: clamp(2rem, 9vw, 2.5rem);
-        line-height: 1;
-        letter-spacing: -0.02em;
-        margin: 0;
-        color: var(--color-text-primary);
-      }
-
-      .front-identity h1 .surname {
-        display: block;
-        color: var(--color-red);
-      }
-
-      .front-identity .role {
-        margin: 14px 0 0;
-        font-size: 0.92rem;
-        color: var(--color-text-secondary);
-      }
-
-      .front-identity .role .company {
-        font-weight: 600;
-        color: var(--color-text-primary);
-      }
-
-      .front-identity .pitch {
-        margin: 14px 0 0;
-        font-size: 0.82rem;
-        line-height: 1.5;
-        color: var(--color-text-secondary);
-      }
-
-      .front-identity .pitch em {
-        font-style: normal;
-        color: var(--color-text-primary);
-        font-weight: 600;
       }
 
       .front-footer {
@@ -348,10 +374,7 @@
         opacity: 0.75;
       }
 
-      .flip-hint svg {
-        width: 12px;
-        height: 12px;
-      }
+      .flip-hint svg { width: 12px; height: 12px; }
 
       /* ---------- BACK ---------- */
       .face-back .inner {
@@ -376,17 +399,12 @@
         align-items: center;
         gap: 8px;
       }
-
-      .back-header .brand img {
-        height: 22px;
-        width: auto;
-      }
-
+      .back-header .brand img { height: 22px; width: auto; }
       .back-header .brand .wordmark {
         font-family: var(--font-display);
         font-weight: 500;
         font-size: 1rem;
-        color: var(--color-text-primary);
+        color: var(--color-red);
       }
 
       .back-header .label {
@@ -408,7 +426,6 @@
         border-left: 3px solid var(--color-red);
         border-radius: var(--radius-sm);
       }
-
       .pitch-back em {
         font-style: normal;
         color: var(--color-text-primary);
@@ -496,7 +513,7 @@
         text-transform: uppercase;
       }
 
-      /* ---------- Hint pill (top) ---------- */
+      /* ---------- Chrome UI ---------- */
       .drag-hint {
         position: fixed;
         top: calc(16px + env(safe-area-inset-top, 0px));
@@ -523,7 +540,37 @@
         transform: translateX(-50%) translateY(-8px);
       }
 
-      /* ---------- Motion permission pill (iOS) ---------- */
+      .theme-toggle {
+        position: fixed;
+        top: calc(14px + env(safe-area-inset-top, 0px));
+        right: calc(14px + env(safe-area-inset-right, 0px));
+        z-index: 4;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        backdrop-filter: saturate(140%) blur(10px);
+        -webkit-backdrop-filter: saturate(140%) blur(10px);
+        box-shadow: var(--shadow-sm);
+        transition: color 150ms ease, border-color 150ms ease, transform 150ms ease;
+      }
+      .theme-toggle:hover {
+        color: var(--color-text-primary);
+        border-color: rgba(31, 26, 23, 0.22);
+      }
+      .theme-toggle:active { transform: scale(0.96); }
+      .theme-toggle svg { width: 18px; height: 18px; }
+      .theme-toggle .icon-moon { display: none; }
+      html:not(.force-light) .theme-toggle .icon-sun { display: none; }
+      html:not(.force-light) .theme-toggle .icon-moon { display: block; }
+
       .motion-enable {
         position: fixed;
         bottom: calc(16px + env(safe-area-inset-bottom, 0px));
@@ -559,6 +606,24 @@
   </head>
   <body>
     <canvas id="scene" aria-hidden="true"></canvas>
+
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle light mode" title="Toggle light mode">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <line x1="12" y1="2" x2="12" y2="4"></line>
+        <line x1="12" y1="20" x2="12" y2="22"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="2" y1="12" x2="4" y2="12"></line>
+        <line x1="20" y1="12" x2="22" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+    </button>
+
     <button id="enable-motion" class="motion-enable" type="button" hidden>
       Enable motion
     </button>
@@ -573,22 +638,25 @@
             <div class="rule" aria-hidden="true"></div>
             <div class="inner">
               <header class="front-header">
-                <img class="brand-logo" src="./lucie-logo-red.png" alt="Lucie" width="28" height="28" />
-                <div class="brand-text">
-                  <span class="wordmark">Lucie</span>
-                  <span class="tagline">AI for manufacturing</span>
-                </div>
+                <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Available</span>
+                <a
+                  class="personal"
+                  href="https://www.linkedin.com/in/diego-pollack-21a933262/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Diego Pollack on LinkedIn"
+                >
+                  <span>Diego Pollack · CTO</span>
+                  <span class="li-dot" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.368-1.852 3.6 0 4.268 2.37 4.268 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path></svg>
+                  </span>
+                </a>
               </header>
 
               <div class="front-identity">
-                <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Available</span>
-                <h1>
-                  Diego
-                  <span class="surname">Pollack</span>
-                </h1>
-                <p class="role">
-                  Co-founder &amp; CTO · <span class="company">Lucie</span>
-                </p>
+                <img class="hero-logo" src="./lucie-logo-red.png" alt="Lucie" width="64" height="64" />
+                <h1 class="hero-word">Lucie</h1>
+                <p class="hero-tagline">planning made easy</p>
                 <p class="pitch">
                   A <em>precision instrument</em> for plant directors and production planners — turning SAP chaos and line noise into confident daily decisions.
                 </p>
@@ -642,14 +710,14 @@
 
                 <a
                   class="btn btn-secondary"
-                  href="https://www.linkedin.com/in/diego-pollack-21a933262/"
+                  href="https://www.linkedin.com/company/lucieops/"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.852 3.368-1.852 3.6 0 4.268 2.37 4.268 5.455v6.288zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.063 2.063 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"></path>
                   </svg>
-                  <span class="label">LinkedIn</span>
+                  <span class="label">Lucie on LinkedIn</span>
                   <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
@@ -691,6 +759,21 @@
       </div>
     </main>
 
+    <script>
+      // Apply force-light early to avoid FOUC on dark-forcing browsers.
+      (function () {
+        try {
+          const saved = localStorage.getItem("lucie-card-force-light");
+          // Default ON — keep the page light even when the phone forces dark.
+          if (saved !== "0") {
+            document.documentElement.classList.add("force-light");
+          }
+        } catch {
+          document.documentElement.classList.add("force-light");
+        }
+      })();
+    </script>
+
     <script type="importmap">
       {
         "imports": {
@@ -706,16 +789,25 @@
       const card = document.getElementById("card");
       const motionBtn = document.getElementById("enable-motion");
       const dragHint = document.getElementById("drag-hint");
+      const themeToggle = document.getElementById("theme-toggle");
 
       const prefersReducedMotion = window.matchMedia(
         "(prefers-reduced-motion: reduce)"
       ).matches;
 
-      // Parallax tilt (gyro or mouse) — subtle, independent of the flip rotation.
+      // ---------- THEME TOGGLE ----------
+      themeToggle.addEventListener("click", () => {
+        const forced = document.documentElement.classList.toggle("force-light");
+        try {
+          localStorage.setItem("lucie-card-force-light", forced ? "1" : "0");
+        } catch {}
+      });
+
+      // ---------- TILT / PARALLAX ----------
       const tilt = { tx: 0, ty: 0, cx: 0, cy: 0, hasGyro: false };
       const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
-      // Flip rotation state — Y axis, unbounded; snaps to multiples of 180.
+      // Flip rotation state — Y axis, unbounded; snaps to multiples of 180°.
       let rotY = 0;
       let rotYRender = 0;
       let dragging = false;
@@ -757,7 +849,7 @@
               window.addEventListener("deviceorientation", handleOrientation);
             }
           } catch {
-            /* user dismissed — keep pointer fallback */
+            /* dismissed — pointer fallback stays active */
           } finally {
             motionBtn.hidden = true;
           }
@@ -767,10 +859,13 @@
       // ---------- DRAG TO ROTATE ----------
       card.addEventListener("pointerdown", (e) => {
         if (e.pointerType === "mouse" && e.button !== 0) return;
+        // Always reset so a stale move value from an earlier drag can't swallow a fresh click.
+        moveDelta = 0;
+        // If the tap lands on a link/button, don't start a card drag — let the link handle it.
+        if (e.target.closest("a, button")) return;
         dragging = true;
         dragStartX = e.clientX;
         dragStartRotY = rotY;
-        moveDelta = 0;
         card.classList.add("dragging");
       });
 
@@ -785,7 +880,7 @@
         if (!dragging) return;
         dragging = false;
         card.classList.remove("dragging");
-        if (moveDelta > 6) {
+        if (moveDelta > 10) {
           rotY = Math.round(rotY / 180) * 180;
           hideHint();
         }
@@ -793,12 +888,12 @@
       window.addEventListener("pointerup", endDrag);
       window.addEventListener("pointercancel", endDrag);
 
-      // Capture-phase click: swallow accidental link activation during drag,
-      // and flip when the user taps empty card area.
+      // Capture-phase click: swallow accidental link activation if a real drag happened;
+      // flip the card when user taps empty card area.
       card.addEventListener(
         "click",
         (e) => {
-          if (moveDelta > 6) {
+          if (moveDelta > 10) {
             e.preventDefault();
             e.stopPropagation();
             moveDelta = 0;
@@ -819,9 +914,7 @@
       function loop() {
         tilt.cx += (tilt.tx - tilt.cx) * 0.06;
         tilt.cy += (tilt.ty - tilt.cy) * 0.06;
-        // Instant tracking while dragging, eased afterwards.
         rotYRender += (rotY - rotYRender) * (dragging ? 1 : 0.16);
-
         const tiltX = tilt.cy * -4;
         const tiltY = tilt.cx * 4;
         card.style.transform =
@@ -855,25 +948,49 @@
         const red = new THREE.Color("#772310");
         const amber = new THREE.Color("#D4940A");
 
+        // Shapes live at the top and bottom of the viewport so they always
+        // peek above/below the card, even on narrow phones.
         const outer = new THREE.LineSegments(
-          new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.9, 0)),
-          new THREE.LineBasicMaterial({ color: red, transparent: true, opacity: 0.5 })
+          new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.15, 0)),
+          new THREE.LineBasicMaterial({ color: red, transparent: true, opacity: 0.55 })
         );
+        outer.position.set(-0.2, 2.15, -0.4);
         scene.add(outer);
 
         const inner = new THREE.LineSegments(
           new THREE.EdgesGeometry(new THREE.OctahedronGeometry(0.95, 0)),
-          new THREE.LineBasicMaterial({ color: teal, transparent: true, opacity: 0.42 })
+          new THREE.LineBasicMaterial({ color: teal, transparent: true, opacity: 0.5 })
         );
+        inner.position.set(0.3, -2.2, -0.3);
         scene.add(inner);
 
-        const dustCount = 18;
+        // Small accent tetrahedron — top-right, adds balance.
+        const accent = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.TetrahedronGeometry(0.5, 0)),
+          new THREE.LineBasicMaterial({ color: amber, transparent: true, opacity: 0.45 })
+        );
+        accent.position.set(1.9, 1.55, -0.8);
+        scene.add(accent);
+
+        // Second accent — bottom-left, teal dodecahedron-ish.
+        const accent2 = new THREE.LineSegments(
+          new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(0.45, 0)),
+          new THREE.LineBasicMaterial({ color: teal, transparent: true, opacity: 0.4 })
+        );
+        accent2.position.set(-1.95, -1.55, -0.9);
+        scene.add(accent2);
+
+        // Amber dust motes — wider spread, denser, biased away from center.
+        const dustCount = 46;
         const dustPos = new Float32Array(dustCount * 3);
         for (let i = 0; i < dustCount; i++) {
-          const r = 2.6 + Math.random() * 2.6;
+          const r = 2.5 + Math.random() * 3.2;
           const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          dustPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+          // Phi biased to poles (top/bottom of sphere) so dust clusters above/below.
+          const u = Math.random();
+          const biased = u < 0.5 ? u * 0.5 : 0.5 + (u - 0.5) * 1.5;
+          const phi = Math.acos(2 * biased - 1);
+          dustPos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
           dustPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
           dustPos[i * 3 + 2] = r * Math.cos(phi) - 0.5;
         }
@@ -883,9 +1000,9 @@
           dustGeo,
           new THREE.PointsMaterial({
             color: amber,
-            size: 0.045,
+            size: 0.05,
             transparent: true,
-            opacity: 0.45,
+            opacity: 0.55,
             depthWrite: false,
             sizeAttenuation: true,
           })
@@ -914,15 +1031,19 @@
           outer.rotation.x = t * 0.05 + tilt.cy * 0.3;
           inner.rotation.y = -t * 0.13 - tilt.cx * 0.28;
           inner.rotation.x = -t * 0.07 - tilt.cy * 0.2;
+          accent.rotation.y = t * 0.2;
+          accent.rotation.x = t * 0.15;
+          accent2.rotation.y = -t * 0.18;
+          accent2.rotation.z = t * 0.1;
 
-          const breath = 1 + Math.sin(t * 0.5) * 0.015;
+          const breath = 1 + Math.sin(t * 0.5) * 0.02;
           outer.scale.setScalar(breath);
           inner.scale.setScalar(1 / breath);
 
-          dust.rotation.y = t * 0.025;
+          dust.rotation.y = t * 0.03;
 
-          camera.position.x += (tilt.cx * 0.4 - camera.position.x) * 0.03;
-          camera.position.y += (tilt.cy * 0.28 - camera.position.y) * 0.03;
+          camera.position.x += (tilt.cx * 0.5 - camera.position.x) * 0.03;
+          camera.position.y += (tilt.cy * 0.35 - camera.position.y) * 0.03;
           camera.lookAt(0, 0, 0);
 
           renderer.render(scene, camera);
